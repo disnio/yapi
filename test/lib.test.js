@@ -2,11 +2,13 @@ import test from 'ava';
 
 const rewire = require("rewire");
 const lib = rewire('../common/lib.js');
-const initPlugins = lib.initPlugins;
+
+const plugin = rewire('../common/plugin.js')
+const initPlugins = plugin.initPlugins;
 
 
 test('initPlugins', t=>{
-  lib.__set__("getPluginConfig", function(){
+  plugin.__set__("getPluginConfig", function(){
     return {
       server: true,
       client: true
@@ -27,7 +29,7 @@ test('initPlugins', t=>{
 })
 
 test('initPlugins2', t=>{
-  lib.__set__("getPluginConfig", function(){
+  plugin.__set__("getPluginConfig", function(){
     return {
       server: true,
       client: false
@@ -48,7 +50,7 @@ test('initPlugins2', t=>{
 })
 
 test('initPlugins3', t=>{
-  lib.__set__("getPluginConfig", function(){
+  plugin.__set__("getPluginConfig", function(){
     return {
       server: false,
       client: true
@@ -64,7 +66,7 @@ test('initPlugins3', t=>{
 })
 
 test('initPlugins3', t=>{
-  lib.__set__("getPluginConfig", function(){
+  plugin.__set__("getPluginConfig", function(){
     return {
       server: false,
       client: true
@@ -94,7 +96,7 @@ test('initPlugins3', t=>{
 })
 
 test('initPlugins3', t=>{
-  lib.__set__("getPluginConfig", function(){
+  plugin.__set__("getPluginConfig", function(){
     return {
       server: false,
       client: false
@@ -141,3 +143,38 @@ test('isDeepMatch', t=>{
 test('isDeepMatch', t=>{
   t.true(lib.isDeepMatch({a:1, b:2, c: {t:'ttt'}}, {c: {t:'ttt'}}))
 })
+
+test('isDeepMatch', t=>{
+  t.true(lib.isDeepMatch({}, undefined))
+})
+
+test('isDeepMatch', t=>{
+  t.true(lib.isDeepMatch(undefined, {}))
+})
+
+test('isDeepMatch', t=>{
+  t.false(lib.isDeepMatch(undefined, {a:1}))
+})
+
+test('isDeepMatch', t=>{
+  t.true(lib.isDeepMatch({ t: 1,
+    b: '2',
+    ip: '127.0.0.1',
+    interface_id: 1857,
+    ip_enable: true,
+    params: { a: 'x', b: 'y' },
+    res_body: '111',
+    code: 1 }, {t:'1'}))
+})
+
+test('isDeepMatch', t=>{
+    t.true(lib.isDeepMatch({ t:[{a: 1}]}, { t:[{a: 1}]}))
+  })
+
+  test('isDeepMatch', t=>{
+    t.false(lib.isDeepMatch({ t:[{a: 1, b: 12}]}, { t:[{a: 1}]}))
+  })
+
+  test('isDeepMatch', t=>{
+    t.true(lib.isDeepMatch([{a: 1}], [{a: 1}]))
+  })

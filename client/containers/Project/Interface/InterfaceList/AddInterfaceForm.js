@@ -1,9 +1,9 @@
-import React, { Component } from 'react'
+import React, { PureComponent as Component } from 'react'
 import PropTypes from 'prop-types'
 import { Form, Input, Select, Button } from 'antd';
 
 import constants from '../../../../constants/variable.js'
-import { handlePath, nameLengthLimit } from '../../../../common.js'
+import { handleApiPath, nameLengthLimit } from '../../../../common.js'
 const HTTP_METHOD = constants.HTTP_METHOD;
 const HTTP_METHOD_KEYS = Object.keys(HTTP_METHOD);
 
@@ -26,7 +26,7 @@ class AddInterfaceForm extends Component {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        this.props.onSubmit(values,()=>{
+        this.props.onSubmit(values, () => {
           this.props.form.resetFields();
         });
 
@@ -37,7 +37,7 @@ class AddInterfaceForm extends Component {
   handlePath = (e) => {
     let val = e.target.value
     this.props.form.setFieldsValue({
-      path: handlePath(val)
+      path: handleApiPath(val)
     })
   }
   render() {
@@ -75,7 +75,7 @@ class AddInterfaceForm extends Component {
           })(
             <Select>
               {this.props.catdata.map(item => {
-                return <Option key={item._id} value={item._id+""}>{item.name}</Option>
+                return <Option key={item._id} value={item._id + ""}>{item.name}</Option>
               })}
             </Select>
             )}
@@ -102,6 +102,12 @@ class AddInterfaceForm extends Component {
           })(
             <Input onBlur={this.handlePath} addonBefore={prefixSelector} placeholder="/path" />
             )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="注"
+        >
+          <span style={{ color: "#929292" }}>详细的接口数据可以在编辑页面中添加</span>
         </FormItem>
         <FormItem className="catModalfoot" wrapperCol={{ span: 24, offset: 8 }} >
           <Button onClick={this.props.onCancel} style={{ marginRight: "10px" }}  >取消</Button>

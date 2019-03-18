@@ -9,5 +9,13 @@ module.exports = {
     name: 'import-swagger'
   },{
     name: 'statistics'
+  },{
+    name: 'export-data'
+  },{
+    name: 'export-swagger2-data'
+  },{
+    name: 'import-yapi-json'
+  },{
+    name: 'wiki'
   }]
 }

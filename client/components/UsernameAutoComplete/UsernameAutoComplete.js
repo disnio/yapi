@@ -1,10 +1,8 @@
-import React, { Component } from 'react';
+import React, { PureComponent as Component } from 'react';
 import PropTypes from 'prop-types';
-import { Select, Spin } from 'antd';
-// import lodash from 'lodash';
+import { Select } from 'antd';
 import axios from 'axios';
 
-// const debounce = lodash.debounce;
 const Option = Select.Option;
 
 /**
@@ -19,7 +17,7 @@ const Option = Select.Option;
  *s
  */
 
- /**
+/**
  * 获取自动输入的用户信息
  *
  * 获取子组件state
@@ -48,72 +46,76 @@ class UsernameAutoComplete extends Component {
   state = {
     dataSource: [],
     fetching: false
-  }
+  };
 
   static propTypes = {
     callbackState: PropTypes.func
-  }
+  };
 
   // 搜索回调
-  handleSearch = (value) => {
-    const params = { q: value}
+  handleSearch = value => {
+    const params = { q: value };
     // this.lastFetchId += 1;
     // const fetchId = this.lastFetchId;
     this.setState({ fetching: true });
-    axios.get('/api/user/search', { params })
-      .then(data => {
-        // if (fetchId !== this.lastFetchId) { // for fetch callback order
-        //   return;
-        // }
-        const userList = [];
-        data = data.data.data;
+    axios.get('/api/user/search', { params }).then(data => {
+      // if (fetchId !== this.lastFetchId) { // for fetch callback order
+      //   return;
+      // }
+      const userList = [];
+      data = data.data.data;
 
-        if (data) {
-          data.forEach( v => userList.push({
+      if (data) {
+        data.forEach(v =>
+          userList.push({
             username: v.username,
             id: v.uid
-          }));
-          // 取回搜索值后，设置 dataSource
-          this.setState({
-            dataSource: userList
-          });
-        }
-      });
-  }
+          })
+        );
+        // 取回搜索值后，设置 dataSource
+        this.setState({
+          dataSource: userList
+        });
+      }
+    });
+  };
 
   // 选中候选词时
-  handleChange = (value) => {
+  handleChange = value => {
     this.setState({
       dataSource: [],
       // value,
       fetching: false
     });
     this.props.callbackState(value);
-  }
+  };
 
-  render () {
-
+  render() {
     let { dataSource, fetching } = this.state;
+
     const children = dataSource.map((item, index) => (
-      <Option key={index} value={'' + item.id}>{item.username}</Option>
-    ))
-    if(!children.length){
-      fetching = false;
-    }
+      <Option key={index} value={'' + item.id}>
+        {item.username}
+      </Option>
+    ));
+
+    // if (!children.length) {
+    //   fetching = false;
+    // }
     return (
       <Select
         mode="multiple"
         style={{ width: '100%' }}
         placeholder="请输入用户名"
         filterOption={false}
-        notFoundContent={fetching ? <Spin size="small" /> : null}
+        optionLabelProp="children"
+        notFoundContent={fetching ? <span style={{ color: 'red' }}> 当前用户不存在</span> : null}
         onSearch={this.handleSearch}
         onChange={this.handleChange}
-        size="large"
       >
         {children}
       </Select>
-    )
+    );
   }
 }
 

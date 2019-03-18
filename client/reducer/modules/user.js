@@ -9,6 +9,7 @@ const REGISTER = 'yapi/user/REGISTER';
 const SET_BREADCRUMB = 'yapi/user/SET_BREADCRUMB';
 const CHANGE_STUDY_TIP = 'yapi/user/CHANGE_STUDY_TIP';
 const FINISH_STUDY = 'yapi/user/FINISH_STUDY';
+const SET_IMAGE_URL = 'yapi/user/SET_IMAGE_URL';
 
 // Reducer
 const LOADING_STATUS = 0;
@@ -17,6 +18,8 @@ const MEMBER_STATUS = 2;
 // Reducer user
 const initialState = {
   isLogin: false,
+  canRegister: true,
+  isLDAP: false,
   userName: null,
   uid: null,
   email: '',
@@ -32,7 +35,8 @@ const initialState = {
   // }]
   breadcrumb: [],
   studyTip: 0,
-  study: false
+  study: false,
+  imageUrl: ''
 };
 
 export default (state = initialState, action) => {
@@ -40,9 +44,11 @@ export default (state = initialState, action) => {
     case GET_LOGIN_STATE: {
       return {
         ...state,
-        isLogin: (action.payload.data.errcode == 0),
-        role: action.payload.data.data ? action.payload.data.data.role:null,
-        loginState: (action.payload.data.errcode == 0)?MEMBER_STATUS:GUEST_STATUS,
+        isLogin: action.payload.data.errcode == 0,
+        isLDAP: action.payload.data.ladp,
+        canRegister: action.payload.data.canRegister,
+        role: action.payload.data.data ? action.payload.data.data.role : null,
+        loginState: action.payload.data.errcode == 0 ? MEMBER_STATUS : GUEST_STATUS,
         userName: action.payload.data.data ? action.payload.data.data.username : null,
         uid: action.payload.data.data ? action.payload.data.data._id : null,
         type: action.payload.data.data ? action.payload.data.data.type : null,
@@ -66,7 +72,7 @@ export default (state = initialState, action) => {
       }
     }
     case LOGIN_OUT: {
-      return{
+      return {
         ...state,
         isLogin: false,
         loginState: GUEST_STATUS,
@@ -74,7 +80,7 @@ export default (state = initialState, action) => {
         uid: null,
         role: '',
         type: ''
-      }
+      };
     }
     case LOGIN_TYPE: {
       return {
@@ -102,14 +108,21 @@ export default (state = initialState, action) => {
     case CHANGE_STUDY_TIP: {
       return {
         ...state,
-        studyTip:  state.studyTip + 1
-      }
+        studyTip: state.studyTip + 1
+      };
     }
     case FINISH_STUDY: {
       return {
         ...state,
         study: true,
         studyTip: 0
+      };
+    }
+    case SET_IMAGE_URL: {
+      // console.log('state', state);
+      return {
+        ...state,
+        imageUrl: action.data
       };
     }
     default:
@@ -119,20 +132,23 @@ export default (state = initialState, action) => {
 
 // Action Creators
 export function checkLoginState() {
-  return(dispatch)=> {
-    axios.get('/api/user/status').then((res) => {
-      dispatch({
-        type: GET_LOGIN_STATE,
-        payload: res
-      });
-    })
-  }
+  return {
+    type: GET_LOGIN_STATE,
+    payload: axios.get('/api/user/status')
+  };
 }
 
 export function loginActions(data) {
   return {
     type: LOGIN,
     payload: axios.post('/api/user/login', data)
+  };
+}
+
+export function loginLdapActions(data) {
+  return {
+    type: LOGIN,
+    payload: axios.post('/api/user/login_by_ldap', data)
   };
 }
 
@@ -153,32 +169,39 @@ export function logoutActions() {
   return {
     type: LOGIN_OUT,
     payload: axios.get('/api/user/logout')
-  }
+  };
 }
 
 export function loginTypeAction(index) {
-  return{
+  return {
     type: LOGIN_TYPE,
     index
-  }
+  };
 }
 
 export function setBreadcrumb(data) {
-  return{
+  return {
     type: SET_BREADCRUMB,
     data
-  }
+  };
+}
+
+export function setImageUrl(data) {
+  return {
+    type: SET_IMAGE_URL,
+    data
+  };
 }
 
 export function changeStudyTip() {
   return {
     type: CHANGE_STUDY_TIP
-  }
+  };
 }
 
 export function finishStudy() {
   return {
     type: FINISH_STUDY,
     payload: axios.get('/api/user/up_study')
-  }
+  };
 }
